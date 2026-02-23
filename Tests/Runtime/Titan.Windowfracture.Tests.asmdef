@@ -1,0 +1,17 @@
+{
+    "name": "Titan.Windowfracture.Tests",
+    "references": [
+        "Titan.Windowfracture"
+    ],
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "MathNet.Numerics.dll",
+        "MathNet.Spatial.dll"
+    ],
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "autoReferenced": true
+}
