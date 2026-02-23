@@ -1,21 +1,24 @@
 using UnityEngine;
 
-[ExecuteInEditMode]
-[RequireComponent(typeof(LineRenderer))]
-public class LineRendererFollow : MonoBehaviour
+namespace WindowFracture.Sample
 {
-    private LineRenderer _lineRenderer;
-    public Transform _targetTransform;
-    public Vector3 _targetOffset;
-    
-    void Start()
+    [ExecuteInEditMode]
+    [RequireComponent(typeof(LineRenderer))]
+    public class LineRendererFollow : MonoBehaviour
     {
-        _lineRenderer = GetComponent<LineRenderer>();
-    }
+        private LineRenderer _lineRenderer;
+        public Transform _targetTransform;
+        public Vector3 _targetOffset;
+        
+        void Start()
+        {
+            _lineRenderer = GetComponent<LineRenderer>();
+        }
 
-    void Update()
-    {
-        if (_targetTransform)
-            _lineRenderer.SetPositions(new []{transform.position, _targetTransform.position + _targetOffset});
+        void Update()
+        {
+            if (_targetTransform)
+                _lineRenderer.SetPositions(new []{transform.position, _targetTransform.position + _targetOffset});
+        }
     }
 }

@@ -90,4 +90,4 @@ For code architecture, algorithm flow, diagrams, and implementation details, see
 
 ## License And Third-Party
 
-This package includes MathNet third-party binaries. See `Third Party Notices.md` for details.
+This package includes MathNet third-party binaries. See `Third-Party Notices.txt` for details.

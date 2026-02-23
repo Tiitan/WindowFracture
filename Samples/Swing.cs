@@ -2,22 +2,25 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(Rigidbody))]
-public class Swing : MonoBehaviour
+namespace WindowFracture.Sample
 {
-    private Rigidbody _rigidBody = new Rigidbody();
-
-    public Vector3 Force;
-    public float Frequency = 1;
-    
-    void Start()
+    [RequireComponent(typeof(Rigidbody))]
+    public class Swing : MonoBehaviour
     {
-        _rigidBody = GetComponent<Rigidbody>();
-    }
+        private Rigidbody _rigidBody = new Rigidbody();
 
-    // Update is called once per frame
-    void Update()
-    {
-        _rigidBody.AddForce(Force * Mathf.Cos(Frequency * Time.time));
+        public Vector3 Force;
+        public float Frequency = 1;
+        
+        void Start()
+        {
+            _rigidBody = GetComponent<Rigidbody>();
+        }
+
+        // Update is called once per frame
+        void Update()
+        {
+            _rigidBody.AddForce(Force * Mathf.Cos(Frequency * Time.time));
+        }
     }
 }
