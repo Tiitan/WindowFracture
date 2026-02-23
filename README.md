@@ -1,80 +1,93 @@
-# Glass system
-This glass shatter system simulate window fracture with hand drawn impact patterns.
-it is inspired by Receiver 2's algorithms: On impact, a 2D pattern is clipped on the glass surface. this list of lines is then converted to a list of polygons (shards), finally the list of polygon is used to build the new meshes and game objects.
-Contrary to other fracture packages that allows to breaks arbitrary 3D volumes, this package is specialized in realistically simulating two dimensional windows. Moreover it focuses on simulating Annealed Glass which is standard non-security glass.
-The hand drawn nature of the fracture pattern provide 2 major benefit over a procedural approach with no real drawback:
-- You keep your full creative freedom over the style of fracture you wish to see, to match the style of your project contrary to a simple procedural approach that lacks details and personality.
-- The shard generation stays very lightweight and mobile friendly compared to a physics based fracture method.
-- By rotating the patterns, only a handful of fracture meshes are enough to keep the illusion of randomness.
+# Window Fracture
 
-In this released package, there is a glass prefab ready to be shattered. The "break" function just takes a world impact position and an origin direction vector. For physic impact, you should just use the velocity and colision point of the incoming object, for raycast use the raycast direction, the vector magnitude is the impact strength.
+Window Fracture is a runtime package for realistic, pattern-driven window shattering focused on flat glass panels.
 
-This package focuses on annealed glass. It would be very inefficient to make a Tempered glass pattern (The thousand of small pebbles kind), because each shard geometry is built individually and their meshes are unique. It is better to create a particle effect that would use instancing for this kind of glass.
-It is also a bad choice for laminated glass (The kind that breaks without falling, like tesla's cybertruck), here a simple shader would be more suited, with a dynamic additive impact texture. because it is more efficient and because break lines overlap on laminated glass which is impossible with this package.
+On impact, a 2D fracture pattern is projected and clipped on the panel surface, converted into shard polygons, then extruded into runtime shard meshes. This approach is inspired by Receiver 2-style fracture logic and is optimized for annealed glass behavior rather than generic 3D volume destruction.
+
+Compared to heavy physics-fracture workflows, this package keeps full artistic control over break style while remaining lightweight enough for gameplay-heavy and mobile-oriented projects.
 
 ## Features
-- The glass shards can recursively break.
-- The glass transform can be non-uniformly scaled and have any thickness for convenient level design.
-- randomized array of hand-crafted fracture pattern, randomly rotated.
-- Glass mesh of Any convex shape can be used
-- UV0 is propagated to the shards to allow consistent textures.
-- Networking ready: randomness optional (rotation value and pattern index can be passed in)
-- The shard velocity is inherited from it's parent when it detach.
-- Glass corners stay attached to their frame, while the interconnected graph of shard may trigger a fall cascade.
 
-## Resources
-All resources can be changed with these requirements:
+- Hand-crafted fracture patterns with random rotation for high visual variety from a small pattern set.
+- Deterministic-friendly fracture API (`patternIndex`, `rotation`) suitable for replay/network synchronization.
+- Recursive shattering: spawned shards can break again.
+- Supports convex-like panel shapes with arbitrary thickness.
+- Supports non-uniform panel scaling on XY.
+- UV0 propagation from source panel to generated shards for consistent surface texturing.
+- Connectivity-based shard fall behavior:
+  - frame-touching shards stay anchored
+  - disconnected shard islands fall as cascades
+- Lightweight runtime generation compared to full 3D volume fracture systems.
+- Includes a ready-to-use sample scene and assets in `Samples~/Glass Demo`.
 
-### The patterns meshes
-- The patterns should be 2D along the XY plane with all Z=0.
-- They should use mesh topology and the lines should extend past your biggest glass diagonal length to avoid glitches.
-- Each shard (mesh loop) doesn't need to be exactly convex but the Vectors angles from the loop center to each vertex should remain ordered.
-- all vertices must be connected to a loop, except for the ones extending outward and expected to be clipped.
+## Installation
 
-Note: Line meshes import is surprisingly not supported by unity by default, a plugin is required for that, I found several custom importers for that online, but 
-I  made a blender exporter/ unity importer of my own format (https://github.com/Tiitan/BlenderTools) if you want to use it.
+Install with Unity Package Manager as:
 
-### The Glass mesh
+- Embedded package: already available when the folder exists under `Packages/com.titan.windowfracture`.
+- Git URL: add a Git dependency to your `manifest.json`.
 
-- The Glass should be oriented on the XY plane and can be any thickness. 
-- The mesh origin should be at the center along Z axis (vertex Z coordinate sign is used to guess the sides!)
-- Again, not exactly convex but vectors angles to origin must remain ordered, all vertices must be on the side, no vertices can be on the surface
-- Scaling (on XY plane) is supported
-- It must contain 2 sub-meshes (material). The first sub-mesh must be the main surface and the second sub-mesh should be the edges
-- UV coordinate must be mirrored on backside to match front side, only UV0 is propagated, and uvs must be regular (arbitrary triangle selected for the barycentric interpolation).
-- While importing in unity, "Read/Write" option must be enabled
+## Package Layout
 
-### Materials
-They can be anything you want, but for the glass edge shader, if you want to disable backface culling, your vertex shader should push the position a little inward along normal to avoid Z fighting.
-The edge material shouldn't use UV.
+- `Runtime/` runtime scripts, prefab, shader/material/mesh resources, and MathNet plugins.
+- `Samples~/Glass Demo/` removable demo scene and assets importable from Package Manager.
+- `Tests/Runtime/` runtime package tests.
+- `Documentation/tech_doc.md` internal implementation guide.
 
-## dependencies
+## Quick Start
 
-### Math.net Spatial
-https://spatial.mathdotnet.com/
-It is included in the released package and inside the project. It is on (MIT/X11) license. You can also get the latest version on NuGet (https://www.nuget.org/packages/MathNet.Spatial).
+1. Add `WindowFracture.Runtime.GlassPanel` to a GameObject that has `MeshFilter`, `MeshRenderer`, and `Collider`.
+2. Assign one or more fracture line meshes to `Patterns`.
+3. Ensure shared materials are configured on the panel renderer (the runtime keeps these materials on spawned shards).
+4. Trigger fracture from gameplay code:
 
-## Troubleshooting
-TODO
+```csharp
+using WindowFracture.Runtime;
+using UnityEngine;
 
-## Future
-I'm not currently developping this package further. if you want to participate with a PR, here is a backlog you can look into, get in touch to discuss any topics.
+public class BreakExample : MonoBehaviour
+{
+    [SerializeField] private GlassPanel panel;
 
-### Small features
-- support additional UVs (dynamically)
-- handle concave glass panels
-### Large features
-- Tempered glass particle system 
-- Laminated glass shader
-- In-engine glass pattern editor for 
+    public void BreakAt(Vector3 worldPoint, Vector3 worldDirection, float impulse)
+    {
+        panel.Break(worldPoint, worldDirection.normalized * impulse);
+    }
+}
+```
 
-## Known issues
-None, all fixed :)
+5. Optional deterministic mode:
+- Provide `patternIndex` and `rotation` explicitly in `Break(...)` for replay/network sync.
 
-## Licence
-The packaged version of this tool is also available on the unity asset store for free under the store's [EULA](https://unity.com/legal/as-terms?utm_source=google&utm_medium=cpc&utm_campaign=cc_dd_upr_emea_emea_en_aw_dsp-gg_acq_w-rt_2023-03_pmax-mofu_cc3022_mofu-dd&utm_content=&utm_term=&gclid=Cj0KCQjw8qmhBhClARIsANAtbocYuqb7OnPFyv-M6r0zf9QDIOIwoJQN0s3nu9VISXDfI_9XZJarkJIaAjNGEALw_wcB&gclsrc=aw.ds).
+6. Import the `Glass Demo` sample from Package Manager and open `GlassSampleScene.unity` for a full reference setup.
 
-## Contact 
-Contact me on discord Titan#8190 if you have any question.
+## Requirements
 
-You can also create a github issue https://github.com/Tiitan/GlassSystem/issues
+- Unity `6000.3` or newer in the 6000.3 stream.
+
+## Known Limitations
+
+- Current sample materials target URP assets used by the demo project.
+- Runtime fracture is designed for flat, window-like meshes and performs best on simple convex panel shapes.
+- `GlassPanel` currently rejects meshes with fewer than 3 or more than 100 source vertices.
+- UV interpolation currently relies on the first polygon triangle, which is less accurate on irregular UV layouts.
+
+## Package Contents
+
+| Location | Description |
+|---|---|
+| `Runtime/Scripts` | Runtime fracture components and helpers. |
+| `Runtime/Resources` | Runtime meshes, materials, and shader resources. |
+| `Runtime/Prefabs` | Ready-to-use glass prefab. |
+| `Runtime/Plugins/MathNet` | Third-party MathNet binaries used by runtime code. |
+| `Samples~/Glass Demo` | Removable sample scene, scripts, and materials. |
+| `Documentation/tech_doc.md` | Internal architecture and implementation details. |
+| `Documentation/Glass system.md` | Documentation index and navigation entrypoint. |
+
+## Internal Documentation
+
+For code architecture, algorithm flow, diagrams, and implementation details, see `Documentation/tech_doc.md`.
+
+## License And Third-Party
+
+This package includes MathNet third-party binaries. See `Third Party Notices.md` for details.

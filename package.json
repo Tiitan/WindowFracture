@@ -1,0 +1,29 @@
+{
+  "name": "com.titan.windowfracture",
+  "displayName": "Window Fracture",
+  "version": "1.0.0",
+  "unity": "6000.3",
+  "description": "Runtime 2D glass fracture system for window-like meshes with deterministic pattern-based shattering.",
+  "keywords": [
+    "glass",
+    "fracture",
+    "destruction",
+    "window",
+    "shatter"
+  ],
+  "author": {
+    "name": "Florian Noirbent",
+    "email": "florian.noirbent@gmail.com",
+    "url": "https://github.com/Tiitan/WindowFracture"
+  },
+  "samples": [
+    {
+      "displayName": "Glass Demo",
+      "description": "Demo scene, materials, and gameplay scripts showing runtime window fracture usage.",
+      "path": "Samples"
+    }
+  ],
+  "changelogUrl": "https://github.com/Tiitan/WindowFracture/blob/master/CHANGELOG.md",
+  "documentationUrl": "https://github.com/Tiitan/WindowFracture/blob/master/README.md",
+  "licensesUrl": "https://github.com/Tiitan/WindowFracture/blob/master/Third%20Party%20Notices.md"
+}
